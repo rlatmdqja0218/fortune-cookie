@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="얼굴과 이름으로 오늘 조심해야 할 것을 확인하는 방송용 체험 서비스"
+    />
+    <meta name="theme-color" content="#11130f" />
+    <title>오늘의 조심</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="preconnect" href="https://storage.googleapis.com" />
+    <link rel="stylesheet" href="style.css?v=1" />
+    <script src="script.js?v=3" defer></script>
+  </head>
+  <body>
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+
+    <main class="app-shell">
+      <header class="site-header">
+        <button class="brand" id="brandButton" type="button" aria-label="첫 화면으로 이동">
+          <span class="brand-mark" aria-hidden="true"></span>
+          오늘의 조심
+        </button>
+        <p class="privacy-note">
+          <span class="privacy-dot" aria-hidden="true"></span>
+          사진은 기기에 저장되지 않습니다
+        </p>
+      </header>
+
+      <section class="screen is-active" id="introScreen" aria-labelledby="introTitle">
+        <div class="intro-card">
+          <div class="eyebrow">
+            <span class="eyebrow-line" aria-hidden="true"></span>
+            TODAY'S CAUTION
+          </div>
+          <p class="date-label" id="todayLabel"></p>
+          <h1 id="introTitle">
+            오늘, 무엇을<br />
+            <span>조심해야 할까요?</span>
+          </h1>
+          <p class="intro-copy">
+            얼굴과 이름으로 오늘 조심해야 할 것을 확인해보세요.
+            <br class="desktop-break" />
+            가볍지만 왠지 신경 쓰이는 경고를 알려드립니다.
+          </p>
+          <button class="button button-primary button-wide" id="startButton" type="button">
+            <span>오늘의 조심 확인하기</span>
+            <span class="button-arrow" aria-hidden="true">→</span>
+          </button>
+          <p class="experience-note">약 10초 소요 · 실제 운세가 아닌 가벼운 체험 콘텐츠입니다</p>
+        </div>
+
+        <div class="signal-panel" aria-hidden="true">
+          <div class="signal-orbit orbit-one"></div>
+          <div class="signal-orbit orbit-two"></div>
+          <div class="signal-core">
+            <span></span>
+          </div>
+          <div class="signal-caption">
+            <span>CAUTION SIGNAL</span>
+            <strong>STANDBY</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="inputScreen" aria-labelledby="inputTitle">
+        <div class="section-heading">
+          <p class="step-label">STEP 01 · INPUT</p>
+          <h2 id="inputTitle">이름과 얼굴을 알려주세요</h2>
+          <p>결과를 확인한 뒤 입력한 정보는 브라우저 안에서만 사라집니다.</p>
+        </div>
+
+        <form class="input-grid" id="fortuneForm">
+          <div class="form-panel">
+            <label class="field-label" for="nameInput">
+              이름
+              <span>결과에 표시될 이름을 입력해주세요</span>
+            </label>
+            <div class="text-field">
+              <input
+                id="nameInput"
+                name="name"
+                type="text"
+                maxlength="12"
+                autocomplete="off"
+                placeholder="예: 김조심"
+                required
+              />
+              <span class="character-count"><b id="nameCount">0</b>/12</span>
+            </div>
+            <p class="field-error" id="nameError" role="alert"></p>
+
+            <div class="camera-heading">
+              <div>
+                <span class="field-label">얼굴 촬영</span>
+                <p>밝은 곳에서 얼굴을 화면 중앙에 맞춰주세요.</p>
+              </div>
+              <span class="local-badge">기기 내 처리</span>
+            </div>
+
+            <div class="camera-frame" id="cameraFrame">
+              <video id="cameraVideo" autoplay playsinline muted></video>
+              <canvas id="captureCanvas" hidden></canvas>
+              <img id="capturedImage" alt="촬영한 얼굴 미리보기" />
+
+              <div class="camera-placeholder" id="cameraPlaceholder">
+                <span class="camera-icon" aria-hidden="true"></span>
+                <strong>카메라를 준비하고 있습니다</strong>
+                <p>브라우저에서 카메라 사용을 허용해주세요.</p>
+              </div>
+
+              <div class="face-guide" id="faceGuide" aria-hidden="true">
+                <span class="corner corner-tl"></span>
+                <span class="corner corner-tr"></span>
+                <span class="corner corner-bl"></span>
+                <span class="corner corner-br"></span>
+                <span class="guide-line"></span>
+              </div>
+
+              <div class="camera-status" id="cameraStatus" aria-live="polite">
+                <span class="status-dot"></span>
+                <span id="cameraStatusText">카메라를 켜서 얼굴을 촬영해주세요</span>
+              </div>
+            </div>
+
+            <div class="camera-actions">
+              <button class="button button-secondary" id="cameraButton" type="button">
+                카메라 켜기
+              </button>
+              <button class="button button-secondary" id="captureButton" type="button" disabled>
+                <span class="shutter-icon" aria-hidden="true"></span>
+                얼굴 촬영하기
+              </button>
+              <button class="button button-secondary" id="retakeButton" type="button" hidden>
+                다시 촬영하기
+              </button>
+            </div>
+          </div>
+
+          <aside class="preview-panel">
+            <div class="preview-label">
+              <span>분석 준비 상태</span>
+              <b id="readyCount">0 / 2</b>
+            </div>
+            <div class="ready-item" id="nameReadyItem">
+              <span class="ready-icon">01</span>
+              <div>
+                <strong>이름 입력</strong>
+                <p id="nameReadyText">아직 입력되지 않았습니다</p>
+              </div>
+              <span class="ready-check" aria-hidden="true">✓</span>
+            </div>
+            <div class="ready-item" id="photoReadyItem">
+              <span class="ready-icon">02</span>
+              <div>
+                <strong>얼굴 촬영</strong>
+                <p id="photoReadyText">촬영을 기다리고 있습니다</p>
+              </div>
+              <span class="ready-check" aria-hidden="true">✓</span>
+            </div>
+            <div class="preview-divider"></div>
+            <p class="preview-message">
+              두 가지 준비가 완료되면<br />
+              오늘의 조심 신호를 확인합니다.
+            </p>
+            <button class="button button-primary" id="submitButton" type="submit" disabled>
+              오늘의 조심 보기
+              <span class="button-arrow" aria-hidden="true">→</span>
+            </button>
+          </aside>
+        </form>
+      </section>
+
+      <section class="screen" id="loadingScreen" aria-labelledby="loadingTitle" aria-live="polite">
+        <div class="loading-card">
+          <p class="step-label">SIGNAL ANALYSIS</p>
+          <div class="scanner" aria-hidden="true">
+            <div class="scanner-ring ring-one"></div>
+            <div class="scanner-ring ring-two"></div>
+            <div class="scanner-face">
+              <img id="loadingPhoto" alt="" />
+              <span class="scan-line"></span>
+            </div>
+            <span class="scanner-point point-one"></span>
+            <span class="scanner-point point-two"></span>
+            <span class="scanner-point point-three"></span>
+          </div>
+          <h2 id="loadingTitle">오늘의 불길한 기운을 확인하는 중입니다</h2>
+          <p id="loadingSubtext">평범한 하루에 숨어 있는 작은 변수를 찾고 있습니다.</p>
+          <div class="loading-progress" aria-hidden="true">
+            <span id="loadingProgress"></span>
+          </div>
+          <p class="loading-percent"><b id="loadingPercent">0</b>%</p>
+        </div>
+      </section>
+
+      <section class="screen" id="resultScreen" aria-labelledby="resultTitle">
+        <article class="result-card">
+          <div class="result-topline">
+            <div>
+              <p class="step-label">TODAY'S CAUTION</p>
+              <p class="result-name"><span id="resultName"></span>님의 오늘 신호</p>
+            </div>
+            <p class="result-date" id="resultDate"></p>
+          </div>
+
+          <div class="result-main">
+            <p class="result-kicker">오늘의 한마디</p>
+            <h2 id="resultTitle"></h2>
+            <p class="result-subtitle" id="resultSubtitle"></p>
+          </div>
+
+          <div class="score-section">
+            <div class="score-heading">
+              <span>오늘의 행운지수</span>
+              <strong><b id="resultScore">50</b>점</strong>
+            </div>
+            <div
+              class="score-track"
+              role="meter"
+              aria-label="오늘의 행운지수"
+              aria-valuemin="50"
+              aria-valuemax="100"
+              aria-valuenow="50"
+              id="scoreTrack"
+            >
+              <span id="scoreFill"></span>
+              <i id="scoreMarker"></i>
+            </div>
+            <div class="score-scale" aria-hidden="true">
+              <span>50</span>
+              <span>75</span>
+              <span>100</span>
+            </div>
+          </div>
+
+          <div class="result-detail">
+            <span class="detail-label">오늘의 흐름</span>
+            <p id="resultDescription"></p>
+          </div>
+
+          <p class="result-disclaimer">
+            본 결과는 재미를 위한 콘텐츠이며 실제 얼굴 분석이나 운세 판단을 하지 않습니다.
+          </p>
+
+          <div class="result-actions">
+            <button class="button button-primary" id="rerollButton" type="button">
+              다른 조심 보기
+              <span class="button-arrow" aria-hidden="true">↻</span>
+            </button>
+            <button class="button button-ghost" id="homeButton" type="button">처음으로</button>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <noscript>이 체험을 이용하려면 브라우저에서 JavaScript를 켜주세요.</noscript>
+  </body>
+</html>
